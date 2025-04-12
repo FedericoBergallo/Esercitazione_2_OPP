@@ -15,15 +15,17 @@ public:
         a=re;
         b=im;
     }
-    T parte_reale(void){   //metodo che restituisce la parte reale ( esempio: m.parte_reale() resituisce la parte reale di m)
-        T reale= a;
-        return reale;
-    }
-    T parte_immaginaria(void){ //metodo che restituisce la parte immahinaria ( esempio: m.parte_immaginaria() resituisce la parte immaginaria di m)
-        T immaginaria= b;
-        return immaginaria;
-    }
-    complex_number coniugato(void){  //metodo che restituisce il comlesso coniugato
+	
+	T parte_reale(void) const   //metodo che restituisce la parte reale ( esempio: m.parte_reale() resituisce la parte reale di m)
+	{ 		
+	return a;
+	}
+    T parte_immaginaria(void) const  //metodo che restituisce la parte immaginaria ( esempio: m.parte_immaginaria() resituisce la parte immaginaria di m)
+	{
+		return b;
+	}   
+    
+	complex_number coniugato(void){  //metodo che restituisce il comlesso coniugato
         complex_number<T> coniugato(a,-b);
         return coniugato; 
     }
@@ -62,29 +64,87 @@ public:
 		prod *= other;
         return prod;
     }
+	complex_number& operator+=(const T& other) {  //con questo operatore mi aspetto di poter fare la somma tra complex_number + T
+        T e = a; //in e memorizzo la parte reale del numero cui applico il metodo    
+		T f = b; //in f memorizzo la parte immaginaria del nuemero cui applico il metodo
+		T g = other; //in g memorizzo la parte reale (di *other che in questo caso è lui stesso)
+        T h =0; //in h memorizzo la parte immaginaria (di *other)
+		T re= e + g;
+		T im= b + h;
+		this->a=re;  //salvo in this il valore aggiornato della parte reale
+		this->b=im;  //salvo in this il valore aggiornato della parte immaginaria		
+		return *this;
+	}
+
+	complex_number operator+(const T& other) const {
+        complex_number ret = *this;
+        ret += other;
+        return ret;
+    }
+	complex_number& operator*=(const T& other) {  //con questo operatore mi aspetto di poter fare: complex_number * T
+        T e = a; //in e memorizzo la parte reale del numero cui applico il metodo    
+		T f = b; //in f memorizzo la parte immaginaria del nuemero cui applico il metodo
+		T g = other; //in g memorizzo la parte reale (di *other che in questo caso è lui stesso)
+        T h =0; //in h memorizzo la parte immaginaria (di *other)
+		T re =(e*g)-(f*h);
+		T im = (e*h)+(f*g);
+		this->a=re;  //salvo in this il valore aggiornato della parte reale
+		this->b=im;  //salvo in this il valore aggiornato della parte immaginaria		
+		return *this;
+	}
+
+	complex_number operator*(const T& other) const {
+        complex_number ret = *this;
+        ret *= other;
+        return ret;
+    }	
 };
+//dopo aver fatto complex +/ * T, voglio poter fare l'"inverso" 
+
+template<typename T>
+complex_number<T>
+operator+(const T& i, const complex_number<T>& c)
+{	
+	return c+i;
+}
+template<typename T>
+complex_number<T>
+operator*(const T& i, const complex_number<T>& c)
+{	
+	return c * i;
+}
 //fornisco un overload dell'operatore "<<" per la rendere stampabile i numeri complessi (elementi della mia classe creata)
 template<typename T>
-	std::ostream& operator << (std::ostream& os,complex_number<T>& c) {
-		if (c.parte_immaginaria() < 0.0)
-			os << c.parte_reale() << "-i" << abs(c.parte_immaginaria());
-		
-		else
-			os << c.parte_reale() << "+i"<<c.parte_immaginaria();  //essendo fuori dalla classe, non è possibile  fare .a o .b 		
+std::ostream& operator << (std::ostream& os, const complex_number<T>& c) {
+    if (c.parte_immaginaria() < 0.0)
+        os << c.parte_reale() << "-i" << abs(c.parte_immaginaria());
+    else
+        os << c.parte_reale() << "+i" << c.parte_immaginaria();
     return os;
-	}
+}
 
 
 int main(void) {
-   complex_number<float> n();  //qui verrà chiamato il costruttore di default che inizializza a 0 parte reale ed immaginaria
-   complex_number<float> m(5.0, 5.0);
-   complex_number<float> o(7.0, 5.0);
+   complex_number<float> n;  //qui verrà chiamato il costruttore di default che inizializza a 0 parte reale ed immaginaria
+   complex_number<double> m(5.0, 5.0);
+   complex_number<double> o(7.0, 5.0);
+   double d=4.0;
+   complex_number<double> result_somma1 = m + o;
+   std::cout <<"Il risultato della somma tra m ed o è: " <<result_somma1 <<std::endl;
    
-   complex_number<float> result_somma = m + o;
-   std::cout <<"Il risultato della somma tra m ed n è: " <<result_somma <<std::endl;
+   complex_number<double> result_prodotto1 = m * o;
+   std::cout <<"Il risultato del prodotto tra m ed n è: " << result_prodotto1 << std::endl;
    
-   complex_number<float> result_prodotto = m * o;
-   std::cout <<"Il risultato del prodotto tra m ed n è: " << result_prodotto << std::endl;
+   complex_number<double> result_somma2= m + d;
+   std::cout <<"Il risultato della somma tra m e d è: " << result_somma2 << std::endl;
    
+   complex_number<double> result_prodotto2 = m * d;
+   std::cout <<"Il risultato del prodotto tra m ed d è: " << result_prodotto2 << std::endl; 
+   
+   complex_number<double> result_somma3= d + m;
+   std::cout <<"Il risultato della somma tra d ed m è: " << result_somma3 << std::endl;
+
+	complex_number<double> result_prodotto3 = d * m;
+    std::cout <<"Il risultato del prodotto tra m ed d è: " << result_prodotto3 << std::endl; 
    return 0;
 }
